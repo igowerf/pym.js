@@ -9,6 +9,11 @@
 <body>
     <div id="example"></div>
     <script type="text/javascript" src="../../src/pym.js"></script>
-    <script>var pymParent = new pym.Parent('example', 'child.html', {});</script>
+    <script>var pymParent = new pym.Parent('example', 'child.html', {
+        _ts_method: 'post',
+        _ts_data: {
+            'geo': 'GB'
+        }
+    });</script>
 </body>
 </html>

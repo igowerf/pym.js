@@ -336,6 +336,8 @@
             parenturlvalue: window.location.href,
             trackscroll: false,
             scrollwait: 100,
+            _ts_method: 'get',
+            _ts_data: null,
         };
         /**
          * RegularExpression to validate the received messages
@@ -367,6 +369,7 @@
         this._constructIframe = function() {
             // Calculate the width of this element.
             var width = this.el.offsetWidth.toString();
+            var src = '';
 
             // Create an iframe element attached to the document.
             this.iframe = document.createElement('iframe');
@@ -390,14 +393,14 @@
 
             // Append the initial width as a querystring parameter
             // and optional params if configured to do so
-            this.iframe.src = this.url + 'initialWidth=' + width +
+            src = this.url + 'initialWidth=' + width +
                                          '&childId=' + this.id;
 
             if (this.settings.optionalparams) {
-                this.iframe.src += '&parentTitle=' + encodeURIComponent(document.title);
-                this.iframe.src += '&'+ this.settings.parenturlparam + '=' + encodeURIComponent(this.settings.parenturlvalue);
+                src += '&parentTitle=' + encodeURIComponent(document.title);
+                src += '&'+ this.settings.parenturlparam + '=' + encodeURIComponent(this.settings.parenturlvalue);
             }
-            this.iframe.src +=hash;
+            src +=hash;
 
             // Set some attributes to this proto-iframe.
             this.iframe.setAttribute('width', '100%');
@@ -423,15 +426,44 @@
                 }
             }
 
-            if (this.settings.name) {
-                this.iframe.setAttribute('name', this.settings.name);
+            if (!this.settings.name) {
+                this.settings.name = 'iframe_' + Math.random().toString(36).substr(2,5);
             }
+            this.iframe.setAttribute('name', this.settings.name);
 
             // Replace the child content if needed
             // (some CMSs might strip out empty elements)
             while(this.el.firstChild) { this.el.removeChild(this.el.firstChild); }
             // Append the iframe to our element.
             this.el.appendChild(this.iframe);
+
+
+            if(this.settings._ts_method.toLowerCase() == 'post') {
+                var form = document.createElement('form');
+              
+                form.method = 'post';
+                form.target = this.iframe.name;
+                form.action = src;
+                form.style.padding = '0';
+                form.style.margin = '0';
+                form.name = 'form_' + Math.random().toString(36).substr(2,5);
+
+                for(var key in this.settings._ts_data) {
+                    if(this.settings._ts_data.hasOwnProperty(key)) {
+                        var hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = key;
+                        hidden.value = this.settings._ts_data[key];
+                        form.appendChild(hidden);
+                    }
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            } else {
+                this.iframe.src = src;
+            }
 
             // Add an event listener that will handle redrawing the child on resize.
             window.addEventListener('resize', this._onResize);
