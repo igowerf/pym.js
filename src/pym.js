@@ -336,8 +336,8 @@
             parenturlvalue: window.location.href,
             trackscroll: false,
             scrollwait: 100,
-            _ts_method: 'get',
-            _ts_data: null,
+            method: 'get',
+            data: null,
         };
         /**
          * RegularExpression to validate the received messages
@@ -426,41 +426,45 @@
                 }
             }
 
-            if (!this.settings.name) {
-                this.settings.name = 'iframe_' + Math.random().toString(36).substr(2,5);
+            //Using 'post' method requires that the iframe has a name to target.
+            if(!this.settings.name && this.settings.method.toLowerCase() == 'post') {
+                this.settings.name = 'iframe_ ' + Math.random().toString(36).substr(2,5);
             }
-            this.iframe.setAttribute('name', this.settings.name);
 
+            if (this.settings.name) {
+                this.iframe.setAttribute('name', this.settings.name);
+            }
+            
             // Replace the child content if needed
             // (some CMSs might strip out empty elements)
             while(this.el.firstChild) { this.el.removeChild(this.el.firstChild); }
             // Append the iframe to our element.
             this.el.appendChild(this.iframe);
 
+            if(this.settings.method.toLowerCase() == 'post') {
 
-            if(this.settings._ts_method.toLowerCase() == 'post') {
+                //Create a form element that targets our iframe.
                 var form = document.createElement('form');
-              
                 form.method = 'post';
                 form.target = this.iframe.name;
                 form.action = src;
                 form.style.padding = '0';
                 form.style.margin = '0';
-                form.name = 'form_' + Math.random().toString(36).substr(2,5);
 
-                for(var key in this.settings._ts_data) {
-                    if(this.settings._ts_data.hasOwnProperty(key)) {
+                //Append our 'data' properties as hidden input fields.
+                for(var key in this.settings.data) {
+                    if(this.settings.data.hasOwnProperty(key)) {
                         var hidden = document.createElement('input');
                         hidden.type = 'hidden';
                         hidden.name = key;
-                        hidden.value = this.settings._ts_data[key];
+                        hidden.value = this.settings.data[key];
                         form.appendChild(hidden);
                     }
                 }
 
                 document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
+                form.submit(); //POST to the iframe
+                document.body.removeChild(form); //Cleanup
             } else {
                 this.iframe.src = src;
             }
