@@ -11,7 +11,14 @@
     else if (typeof module !== 'undefined' && module.exports) {
         module.exports = factory();
     } else {
-        window.pym = factory.call(this);
+        var pym = factory.call(this);
+        window.Telescope = window.Telescope || {};
+        window.pym = pym;
+        window.Telescope.Loader = {};
+        window.Telescope.Loader.Child = pym.Child;
+        window.Telescope.loadApplication = function(options) {
+            return new pym.Parent(options.id, options.url, options);
+        };
     }
 })(function() {
     var MESSAGE_DELIMITER = 'xPYMx';
@@ -338,6 +345,7 @@
             scrollwait: 100,
             method: 'get',
             data: null,
+            name: 'iframe_ ' + Math.random().toString(36).substr(2,5)
         };
         /**
          * RegularExpression to validate the received messages
@@ -427,7 +435,7 @@
             }
 
             //Using 'post' method requires that the iframe has a name to target.
-            if(!this.settings.name && this.settings.method.toLowerCase() == 'post') {
+            if(!this.settings.name && this.settings.method.toLowerCase() === 'post') {
                 this.settings.name = 'iframe_ ' + Math.random().toString(36).substr(2,5);
             }
 
@@ -440,8 +448,8 @@
             while(this.el.firstChild) { this.el.removeChild(this.el.firstChild); }
             // Append the iframe to our element.
             this.el.appendChild(this.iframe);
-
-            if(this.settings.method.toLowerCase() == 'post') {
+            
+            if(this.settings.method.toLowerCase() === 'post') {
 
                 //Create a form element that targets our iframe.
                 var form = document.createElement('form');
@@ -726,7 +734,7 @@
         this.onMessage('height', this._onHeightMessage);
         this.onMessage('navigateTo', this._onNavigateToMessage);
         this.onMessage('scrollToChildPos', this._onScrollToChildPosMessage);
-        this.onMessage('parentPositionInfo', this.sendViewportAndIFramePosition);
+        this.onMessage('parentPositionInfo', this.sendViewportAndIFramePosition);        
 
         // Add a listener for processing messages from the child.
         window.addEventListener('message', this._processMessage, false);

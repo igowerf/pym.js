@@ -1,5 +1,5 @@
 {
-  "name": "pym.js",
+  "name": "tldr.js",
   "version": "1.3.1",
   "defaultPymUrl": "https://pym.nprapps.org/pym.v1.min.js",
   "description": "Resize an iframe responsively depending on the height of its content and the width of its container.",
