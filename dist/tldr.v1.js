@@ -1,4 +1,4 @@
-/*! tldr.js - v1.3.1 - 2018-03-12 */
+/*! tldr.js - v1.3.2 - 2018-03-12 */
 /*
 * Pym.js is library that resizes an iframe based on the width of the parent and the resulting height of the child.
 * Check out the docs at http://blog.apps.npr.org/pym.js/ or the readme at README.md for usage.
