@@ -16,7 +16,7 @@
         window.pym = pym;
         window.Telescope.Loader = {};
         window.Telescope.Loader.Child = pym.Child;
-        window.Telescope.loadApplication = pym.loadApplication;
+        window.Telescope.loadApplication = pym.loadApplication.bind(pym);
     }
 })(function() {
     var MESSAGE_DELIMITER = 'xPYMx';
