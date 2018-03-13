@@ -16,9 +16,7 @@
         window.pym = pym;
         window.Telescope.Loader = {};
         window.Telescope.Loader.Child = pym.Child;
-        window.Telescope.loadApplication = function(options) {
-            return new pym.Parent(options.id, options.url, options);
-        };
+        window.Telescope.loadApplication = pym.loadApplication;
     }
 })(function() {
     var MESSAGE_DELIMITER = 'xPYMx';
@@ -1139,6 +1137,10 @@
         _markWhetherEmbedded(config.onMarkedEmbeddedStatus);
 
         return this;
+    };
+
+    lib.loadApplication = function(options) {
+        return new this.Parent(options.id, options.url, options);
     };
 
     // @ifdef AUTOINIT
